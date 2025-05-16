@@ -16,8 +16,19 @@ import PersonelListesi from "./PersonelListesi";
 
 function HomePage() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [name, setName] = useState();
+  const [open, setOpen] = useState(false);
+  const [mail, setMail] = useState("denizmetin@gmail.com");
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("data"));
+    const token = userData.token
+    setName(userData.firstName)
+    console.log(token);
+    console.log(name);
+
+    //token boşsa login page git
     if (
       localStorage.theme === "dark" ||
       (!("theme" in localStorage) &&
@@ -53,10 +64,7 @@ function HomePage() {
     },
   ];
 
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("Deniz Metin ");
-  const [mail, setMail] = useState("denizmetin@gmail.com");
-  const navigate = useNavigate();
+
 
   const logout = () => {
     localStorage.removeItem("token");

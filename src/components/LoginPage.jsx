@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { FaUserGroup, FaUser, FaEyeSlash } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLoggedIn, setIsLoggedIn] = useState(false);  // Giriş durumu
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
-        // Basit doğrulama (gerçek projede backend'den kontrol edilmeli)
-        if (email && password) {
-            localStorage.setItem("token", "some-auth-token");
-            setIsLoggedIn(true);  // Giriş başarılı, durumu güncelle
-        } else {
-            alert("Lütfen email ve şifre giriniz.");
+        try {
+            const response = await axios.post("http://localhost:8080/api/auth/login", {
+                email,
+                password,
+            });
+
+            const data = response.data;
+            localStorage.setItem("data", JSON.stringify(data));
+            setIsLoggedIn(true);
+        } catch (error) {
+            alert("Giriş başarısız: " + (error.response?.data?.message || "Hatalı e-posta veya şifre."));
         }
     };
 
-    // Giriş başarılı olduğunda yönlendirme işlemi
     useEffect(() => {
         if (isLoggedIn) {
-            navigate("/home");  // Giriş başarılıysa yönlendir
+            navigate("/home");
         }
-    }, [isLoggedIn, navigate]);  // isLoggedIn değiştiğinde useEffect tetiklenir
+    }, [isLoggedIn, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-800 to-cyan-100">
@@ -75,7 +80,7 @@ function LoginPage() {
                         </button>
                     </div>
 
-                    <button
+                    <button onClick={handleLogin}
                         type="submit"
                         className="bg-cyan-500 hover:bg-cyan-600 text-white py-3 w-full rounded-lg font-semibold transition"
                     >
